@@ -19,13 +19,17 @@ jobs:
         uses: actions/checkout@v7
         with:
           persist-credentials: true
+
+      # Download Coverage report
       - name: Download Coverage Artifact
         uses: actions/download-artifact@v4
         with:
           name: code-coverage-report
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          if-no-artifact: error
 
+      # Extract percentage from coverage report
       - name: Extract coverage %
         shell: bash -l {0}
         run: |
@@ -58,6 +62,7 @@ jobs:
           n=$(($PERCENT+0))
           url="https://img.shields.io/badge/Code%20Coverage-${PERCENT}%25-${COLOR}?style=flat"
           curl -sSL --fail "$url" -o badge-data/coverage.svg
+
       # Commit updated badge svg
       - name: Commit badge data
         uses: stefanzweifel/git-auto-commit-action@v4
